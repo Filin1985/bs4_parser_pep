@@ -22,11 +22,16 @@ def default_output(results):
 
 
 def pretty_output(results):
-    table = PrettyTable()
-    table.field_names = results[0]
-    table.align = 'l'
-    table.add_rows(results[1:])
-    print(table)
+    print(results)
+    try:
+        table = PrettyTable()
+        table.field_names = results[0]
+        table.align = 'l'
+        table.add_rows(results[1:])
+        print(table)
+    except Exception as e:
+        print(e)
+
 
 def file_output(results, cli_args):
     results_dir = BASE_DIR / 'results'

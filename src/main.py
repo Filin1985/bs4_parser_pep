@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
-from constants import BASE_DIR, MAIN_DOC_URL, PEPS_URl
+from constants import BASE_DIR, MAIN_DOC_URL, PEPS_URl, EXPECTED_STATUS
 from outputs import control_output
 from utils import get_response, find_tag
 
@@ -23,9 +23,9 @@ def whats_new(session):
     sections_by_python = div_with_ul.find_all(
         'li', attrs={'class': 'toctree-l1'}
     )
-    results = [('Ссылка на статью', 'Заголовок', 'Редактор, автор')]
+    results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
     for section in tqdm(sections_by_python):
-        version_a_tag = section.find('a')
+        version_a_tag = find_tag(section, 'a')
         href = version_a_tag['href']
         version_link = urljoin(whats_new_url, href)
         response = get_response(session, version_link)
@@ -36,9 +36,9 @@ def whats_new(session):
         dl = find_tag(soup, 'dl')
         dl_text = dl.text.replace('\n', ' ')
         results.append(
-            (version_link, h1, dl_text)
+            (version_link, h1.text, dl_text)
         )
-
+    print(results[0])
     return results
 
 
@@ -56,7 +56,7 @@ def latest_versions(session):
             break
         else:
             raise Exception('Ничего не нашлось')
-    results = [('Ссылка на документацию', 'Версия', 'Статус')]
+    result = [('Ссылка на документацию', 'Версия', 'Статус')]
     pattern = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
     for a_tag in a_tags:
         link = a_tag['href']
@@ -65,10 +65,10 @@ def latest_versions(session):
             version, status = text_match.groups()
         else:
             version, status = a_tag.text, ''
-        results.append(
+        result.append(
             (link, version, status)
         )
-    return results
+    return result
 
 
 def download(session):
@@ -101,15 +101,50 @@ def pep(session):
     if response is None:
         return
     soup = BeautifulSoup(response.text, 'lxml')
-    abbr_tags = soup.find_all('abbr')
-    for tag in abbr_tags:
-        print(tag.text)
+    main_tag = find_tag(soup, 'section', {'id': 'numerical-index'})
+    table_row_tags = main_tag.find_all('tr')
+    status_counts = {}
+    results = [('Статус', 'Количество')]
+    for i in range(1, len(table_row_tags)):
+        link_href = table_row_tags[i].a['href']
+        link = urljoin(PEPS_URl, link_href)
+        response = get_response(session, link)
+        soup = BeautifulSoup(response.text, 'lxml')
+        main_pep_data = find_tag(soup, 'section', attrs={'id': 'pep-content'})
+        main_pep_info = find_tag(
+            main_pep_data,
+            'dl',
+            attrs={'class': 'rfc2822 field-list simple'}
+        )
+        for pep in main_pep_info:
+            if pep.name == 'dt' and pep.text == 'Status:':
+                pep_status = pep.next_sibling.next_sibling.string
+                status_counts[pep_status] = status_counts.get(
+                    pep_status, 0
+                ) + 1
+                if len(table_row_tags[i].td.text) != 1:
+                    table_status = table_row_tags[i].td.text[1:]
+                    main_pep_status = table_row_tags[i].td.text[1:]
+                    if pep_status[0] != main_pep_status:
+                        logging.info(
+                            '\n'
+                            'Несовпадающие статусы:\n'
+                            f'{link}\n'
+                            f'Статус в карточке: {pep_status}\n'
+                            f'Ожидаемые статусы: '
+                            f'{EXPECTED_STATUS[table_status]}\n'
+                        )
+    for key in status_counts:
+        results.append((key, str(status_counts[key])))
+    results.append(('Всего', len(table_row_tags)-1))
+    print(results)
+    return results
 
 
 MODE_TO_FUNCTION = {
     'whats-new': whats_new,
     'latest-versions': latest_versions,
-    'pep-status': pep,
+    'pep': pep,
     'download': download,
 }
 
