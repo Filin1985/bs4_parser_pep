@@ -43,8 +43,8 @@ cd src
 ### Запуск парсеров
 
 <details>
-  <summary>whats-new</summary>
+  <summary>Режим "whats-new"</summary>
   <p>Выводит данные по изменениям в языке Python</p>
+  
   <code>python main.py whats-new [параметры]</code>
-    python main.py whats-new [параметры]
 </details>
