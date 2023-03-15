@@ -45,7 +45,6 @@ cd src
 <details>
   <summary>whats-new</summary>
   <p>Выводит данные по изменениям в языке Python</p>
-  ```
+  <code>python main.py whats-new [параметры]</code>
     python main.py whats-new [параметры]
-  ```
 </details>
