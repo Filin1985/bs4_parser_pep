@@ -3,7 +3,7 @@ import datetime as dt
 import logging
 from prettytable import PrettyTable
 
-from constants import BASE_DIR, DATETIME_FORMAT
+from constants import DATETIME_FORMAT, RESULTS_DIR, BASE_DIR
 
 
 def control_output(results, cli_args):
