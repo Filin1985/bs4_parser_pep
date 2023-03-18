@@ -12,6 +12,7 @@ from constants import (
 
 
 def configure_argument_parser(available_modes):
+    """Добавление аргументов командной строки."""
     parser = argparse.ArgumentParser(description='Парсер документации Python')
     parser.add_argument(
         'mode',
@@ -34,6 +35,7 @@ def configure_argument_parser(available_modes):
 
 
 def configure_logging():
+    """Настройки логирования."""
     LOG_DIR.mkdir(exist_ok=True)
     rotating_handler = RotatingFileHandler(
         LOG_FILE, maxBytes=10 ** 6, backupCount=5

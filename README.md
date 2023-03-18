@@ -6,6 +6,7 @@
 
 **Используемые технологии**
 
+- Python
 - BeautifulSoup
 - PrettyTable
 
@@ -89,4 +90,4 @@ cd src
   <code>python main.py pep -o file</code>
 </details>
 
-**Авторы: ЯндексПракиткум, Марат Ихсанов**
+**Авторы: ЯндексПрактикум['https://github.com/yandex-praktikum], Марат Ихсанов['https://github.com/Filin1985]**
