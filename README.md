@@ -7,6 +7,7 @@
 **Используемые технологии**
 
 - BeautifulSoup
+- PrettyTable
 
 ### Запуск проекта
 
@@ -87,3 +88,5 @@ cd src
   <p>2. file - сохраняет файл в формате .csv в папку results/</p>
   <code>python main.py pep -o file</code>
 </details>
+
+**Авторы: ЯндексПракиткум, Марат Ихсанов**

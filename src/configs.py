@@ -5,8 +5,6 @@ from logging.handlers import RotatingFileHandler
 from constants import (
     LOG_FORMAT,
     DT_FORMAT,
-    PRETTY_CHOICE,
-    FILE_CHOICE,
     LOG_DIR,
     LOG_FILE,
     OUTPUT_CHOICES
