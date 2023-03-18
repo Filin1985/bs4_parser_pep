@@ -13,6 +13,7 @@ TAG_MESSAGE = (
 
 
 def get_response(session, url, encoding='utf-8'):
+    """Отправка запроса и обработка ошибки RequestException."""
     try:
         response = session.get(url)
         response.encoding = encoding
@@ -22,15 +23,15 @@ def get_response(session, url, encoding='utf-8'):
 
 
 def find_tag(soup, tag, attrs=None):
+    """Поиск тега и перехват ошибки отсутствия тега."""
     searched_tag = soup.find(tag, attrs=(attrs or {}))
     if searched_tag is None:
-        error = TAG_MESSAGE.format(tag=tag, attrs=attrs)
-        raise ParserFindTagException(error)
+        raise ParserFindTagException(
+            TAG_MESSAGE.format(tag=tag, attrs=attrs)
+        )
     return searched_tag
 
 
-def create_soup(session, url_address):
-    response = get_response(session, url_address)
-    if response is None:
-        return
-    return BeautifulSoup(response.text, features="lxml")
+def create_soup(session, url, features='lxml'):
+    """Отправка запроса и создание объекта BeautifulSoup."""
+    return BeautifulSoup(get_response(session, url).text, features)
