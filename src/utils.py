@@ -34,4 +34,4 @@ def find_tag(soup, tag, attrs=None):
 
 def create_soup(session, url, features='lxml'):
     """Отправка запроса и создание объекта BeautifulSoup."""
-    return BeautifulSoup(get_response(session, url).text, features)
+    return BeautifulSoup(get_response(session, url).text, features="lxml")
