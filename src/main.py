@@ -42,12 +42,12 @@ SOUP_ERROR = "Ссылка {link} не существует"
 def whats_new(session):
     """Парсер о новинках в языке Python."""
     whats_new_url = urljoin(MAIN_DOC_URL, 'whatsnew/')
-    soup = create_soup(session, whats_new_url)
-    sections_by_python = soup.select(
-        '#what-s-new-in-python div.toctree-wrapper li.toctree-l1 a'
-    )
     results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
-    for section in tqdm(sections_by_python):
+    for section in tqdm(
+        create_soup(
+            session, whats_new_url
+        ).select('#what-s-new-in-python div.toctree-wrapper li.toctree-l1 a')
+    ):
         href = section['href']
         version_link = urljoin(whats_new_url, href)
         try:
@@ -58,7 +58,7 @@ def whats_new(session):
                  find_tag(soup, 'dl').text.replace('\n', ' '))
             )
         except ConnectionError as error:
-            raise RuntimeError(CONNECTION_ERROR.format(error=error))
+            logging.error(CONNECTION_ERROR.format(error=error))
     return results
 
 
