@@ -60,8 +60,7 @@ def whats_new(session):
             )
         except ConnectionError as error:
             messages.append(CONNECTION_ERROR.format(error=error))
-    for message in messages:
-        logging.info(message)
+    list(map(logging.error, messages))
     return results
 
 
@@ -147,8 +146,7 @@ def pep(session):
                             table_status=EXPECTED_STATUS[table_status]
                         )
                     )
-    for message in messages:
-        logging.info(message)
+    list(map(logging.error, messages))
     return [
         ('Статус', 'Количество'),
         *status_counts.items(),
