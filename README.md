@@ -90,4 +90,4 @@ cd src
   <code>python main.py pep -o file</code>
 </details>
 
-**Авторы: ЯндексПрактикум['https://github.com/yandex-praktikum], Марат Ихсанов['https://github.com/Filin1985]**
+**Авторы: [ЯндексПрактикум](https://github.com/yandex-praktikum), [Марат Ихсанов](https://github.com/Filin1985)**

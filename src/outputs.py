@@ -1,6 +1,7 @@
 import csv
 import datetime as dt
 import logging
+
 from prettytable import PrettyTable
 
 from constants import (
@@ -15,12 +16,6 @@ from constants import (
 SAVE_MESSAGE = (
     'Файл с результатами был сохранён: {file_path}'
 )
-
-
-def control_output(results, cli_args):
-    """Вывод разных результатов парсинга."""
-    output = cli_args.output
-    OUTPUTS[output](results, cli_args)
 
 
 def default_output(results, cli_args):
@@ -59,3 +54,8 @@ OUTPUTS = {
     FILE_FORMAT: file_output,
     None: default_output
 }
+
+
+def control_output(results, cli_args):
+    """Вывод разных результатов парсинга."""
+    OUTPUTS[cli_args.output](results, cli_args)
