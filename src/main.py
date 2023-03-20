@@ -1,9 +1,10 @@
 from collections import defaultdict
 import logging
 import re
+from urllib.parse import urljoin
+
 import requests_cache
 from tqdm import tqdm
-from urllib.parse import urljoin
 
 from configs import configure_argument_parser, configure_logging
 from constants import (
@@ -40,14 +41,14 @@ SOUP_ERROR = "Ссылка {link} не существует"
 
 
 def whats_new(session):
-    """Парсер о новинках в языке Python."""
     whats_new_url = urljoin(MAIN_DOC_URL, 'whatsnew/')
+    soup = create_soup(session, whats_new_url)
+    sections_by_python = soup.select(
+        '#what-s-new-in-python div.toctree-wrapper li.toctree-l1 > a'
+    )
     results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
-    for section in tqdm(
-        create_soup(
-            session, whats_new_url
-        ).select('#what-s-new-in-python div.toctree-wrapper li.toctree-l1 a')
-    ):
+    messages = []
+    for section in tqdm(sections_by_python):
         href = section['href']
         version_link = urljoin(whats_new_url, href)
         try:
@@ -58,7 +59,9 @@ def whats_new(session):
                  find_tag(soup, 'dl').text.replace('\n', ' '))
             )
         except ConnectionError as error:
-            logging.error(CONNECTION_ERROR.format(error=error))
+            messages.append(CONNECTION_ERROR.format(error=error))
+    for message in messages:
+        logging.info(message)
     return results
 
 
@@ -72,7 +75,7 @@ def latest_versions(session):
             a_tags = ul.find_all('a')
             break
         else:
-            raise KeyError(NOT_FIND_MESSAGE.format(ul=ul))
+            raise ValueError(NOT_FIND_MESSAGE.format(ul=ul))
     result = [('Ссылка на документацию', 'Версия', 'Статус')]
     pattern = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
     for a_tag in a_tags:
@@ -91,9 +94,12 @@ def download(session):
     """Парсер отвечающий за скачивание архива документации Python."""
     downloads_url = urljoin(MAIN_DOC_URL, 'download.html')
     soup = create_soup(session, downloads_url)
-    pdf_a4_tag = soup.select_one('table.docutils a[href$="pdf-a4.zip"]')
-    pdf_a4_link = pdf_a4_tag['href']
-    archive_url = urljoin(downloads_url, pdf_a4_link)
+    archive_url = urljoin(
+        downloads_url,
+        soup.select_one(
+            'table.docutils a[href$="pdf-a4.zip"]'
+        )['href']
+    )
     filename = archive_url.split('/')[-1]
     downloads_dir = BASE_DIR / DOWNLOADS_DIR
     downloads_dir.mkdir(exist_ok=True)
@@ -117,7 +123,8 @@ def pep(session):
         try:
             soup = create_soup(session, link)
         except AttributeError:
-            logging.error(SOUP_ERROR.format(link=link))
+            messages.append(SOUP_ERROR.format(link=link))
+            continue
         main_pep_data = find_tag(soup, 'section', attrs={'id': 'pep-content'})
         main_pep_info = find_tag(
             main_pep_data,

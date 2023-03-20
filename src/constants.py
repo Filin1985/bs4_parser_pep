@@ -16,10 +16,6 @@ DT_FORMAT = '%d.%m.%Y %H:%M:%S'
 
 PRETTY_FORMAT = 'pretty'
 FILE_FORMAT = 'file'
-OUTPUT_CHOICES = {
-    'pretty': 'pretty',
-    'file': 'file'
-}
 EXPECTED_STATUS = {
     'A': ('Active', 'Accepted'),
     'D': ('Deferred',),
