@@ -58,7 +58,7 @@ def whats_new(session):
                  find_tag(soup, 'dl').text.replace('\n', ' '))
             )
         except ConnectionError as error:
-             raise RuntimeError(CONNECTION_ERROR.format(error=error))
+            raise RuntimeError(CONNECTION_ERROR.format(error=error))
     return results
 
 
